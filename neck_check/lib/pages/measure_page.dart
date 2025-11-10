@@ -11,14 +11,22 @@ class _MeasurePageState extends State<MeasurePage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          fixedSize: const Size(220, 68), // 버튼 전체 크기
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20), // 내부 여백
-          textStyle: Theme.of(context).textTheme.titleLarge,
-        ),
-        child: Text('시작'),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 200),
+          Text('자세 분석 시작', style: Theme.of(context).textTheme.titleLarge),
+          SizedBox(height: 60),
+          ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              fixedSize: const Size(220, 68), // 버튼 전체 크기
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20), // 내부 여백
+              textStyle: Theme.of(context).textTheme.titleLarge,
+            ),
+            child: Text('시작'),
+          ),
+        ],
       ),
     );
   }

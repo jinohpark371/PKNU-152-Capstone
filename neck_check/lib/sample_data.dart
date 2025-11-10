@@ -159,17 +159,17 @@ final graphSamples = [
   ),
   PostureSample(
     measuredAt: DateTime(2025, 11, 1, 13, 50),
-    badPosture: Duration(seconds: 540),
+    badPosture: Duration(seconds: 580),
     total: Duration(minutes: 10),
   ),
   PostureSample(
     measuredAt: DateTime(2025, 11, 1, 14, 0),
-    badPosture: Duration(seconds: 510),
+    badPosture: Duration(seconds: 600),
     total: Duration(minutes: 10),
   ),
   PostureSample(
     measuredAt: DateTime(2025, 11, 1, 14, 10),
-    badPosture: Duration(seconds: 495),
+    badPosture: Duration(seconds: 590),
     total: Duration(minutes: 10),
   ),
   PostureSample(

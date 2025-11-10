@@ -5,6 +5,8 @@ import 'package:neck_check/widgets/dot.dart';
 import 'package:neck_check/widgets/posture_ratio_chart.dart';
 import 'package:neck_check/widgets/progress_ring.dart';
 
+import 'calendar_page.dart';
+
 /// 위젯은 Material3 Component
 /// 텍스트는 Material3 TextTheme
 /// 아이콘은 CupertinoIcons
@@ -60,7 +62,14 @@ class _Header extends StatelessWidget {
         SizedBox(width: 5),
         Text('11월1일', style: theme.textTheme.bodyMedium),
         Spacer(),
-        IconButton.filledTonal(onPressed: () {}, icon: Icon(CupertinoIcons.calendar)),
+        IconButton.filledTonal(
+          onPressed: () {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(fullscreenDialog: true, builder: (_) => CalendarPage()));
+          },
+          icon: Icon(CupertinoIcons.calendar),
+        ),
       ],
     );
   }

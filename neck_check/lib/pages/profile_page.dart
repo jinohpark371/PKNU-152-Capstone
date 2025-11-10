@@ -100,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: CupertinoIcons.ellipsis,
           title: '더 보기',
           onTap: () {
-            Navigator.push(context, CupertinoPageRoute(builder: (_) => SettingPage()));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => SettingPage()));
           },
         ),
         const Divider(height: 0),

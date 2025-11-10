@@ -9,14 +9,16 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeArea = MediaQuery.of(context).padding;
     final theme = Theme.of(context);
 
+    final safeArea = MediaQuery.of(context).padding;
+    final topPadding = PlatformInfo.isIOS26OrHigher() ? 100 : 0;
+
     return AdaptiveScaffold(
-      appBar: const AdaptiveAppBar(),
+      appBar: AdaptiveAppBar(title: '더 보기'),
       body: Material(
         child: ListView(
-          padding: EdgeInsets.only(top: safeArea.top + 100, bottom: 50, right: 20, left: 20),
+          padding: EdgeInsets.only(top: safeArea.top + topPadding, bottom: 50, right: 20, left: 20),
           children: [
             Text(
               '개인용',
@@ -72,7 +74,7 @@ class SettingPage extends StatelessWidget {
             const Divider(height: 0),
             SizedBox(height: 45),
 
-            Align(alignment: AlignmentGeometry.center, child: Text('Neck Check v1.01')),
+            Align(alignment: AlignmentGeometry.center, child: Text('Neck Check v0.1.0')),
           ],
         ),
       ),

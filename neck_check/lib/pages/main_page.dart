@@ -2,16 +2,16 @@ import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class AdaptiveNavigationScaffold extends StatefulWidget {
-  const AdaptiveNavigationScaffold({super.key, required this.body});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key, required this.body});
 
   final List<Widget> body;
 
   @override
-  State<AdaptiveNavigationScaffold> createState() => _AdaptiveNavigationScaffoldState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _AdaptiveNavigationScaffoldState extends State<AdaptiveNavigationScaffold> {
+class _MainPageState extends State<MainPage> {
   int currentIndex = 1;
 
   @override
