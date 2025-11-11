@@ -14,9 +14,8 @@ class _MeasurePageState extends State<MeasurePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 200),
           Text('자세 분석 시작', style: Theme.of(context).textTheme.titleLarge),
-          SizedBox(height: 60),
+          const SizedBox(height: 80),
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(

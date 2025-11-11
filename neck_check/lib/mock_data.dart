@@ -1,6 +1,6 @@
 import 'package:neck_check/widgets/posture_ratio_chart.dart';
 
-final graphSamples = [
+final mockGraphData = [
   // 아침 안정 (~10%) 6개
   PostureSample(
     measuredAt: DateTime(2025, 11, 1, 9, 0),
