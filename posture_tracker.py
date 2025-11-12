@@ -1,11 +1,14 @@
 import cv2
 import mediapipe as mp
 import time
+import pandas as pd
 from datetime import datetime
 from is_stable import is_stable;
 
 mp_face_mesh = mp.solutions.face_mesh
-NOSE_INDEX = 1
+NOSE_INDEX = 1 
+# 로그 누적용
+pose_log = []
 
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
@@ -81,12 +84,21 @@ with mp_face_mesh.FaceMesh(
                     pose = "left" if dx < 0 else "right"
 
                 # 거북목 (얼굴 크기 거의 일정하지만 고개만 아래로)
-                elif 0.9 <= face_scale <= 1.15 and dy > 25:
+                elif 0.9 <= face_scale <= 1.45 and dy > 25:
                     pose = "turtle"
 
                 # 나머지 → 정자세
                 else:
                     pose = "normal"
+
+                pose_log.append({
+                  "timestamp": datetime.now(),
+                  "pose": pose,
+                  "dx": dx,
+                  "dy": dy,
+                  "scale": round(face_scale, 3),
+                  "true_pose": None
+              })
 
                 # 텍스트 표시
                 cv2.putText(frame, f"Posture: {pose}", (30, 30),
@@ -158,7 +170,24 @@ with mp_face_mesh.FaceMesh(
             box_history.clear()
             print("정자세 감지 중... (1.5초 동안 유지하세요)")
 
+        elif key in [ord('1'), ord('2'), ord('3'), ord('4'), ord('5')]:
+            label_map = {
+                ord('1'): "normal",
+                ord('2'): "turtle",
+                ord('3'): "L",
+                ord('4'): "left",
+                ord('5'): "right"
+            }
+            true_label = label_map[key]
+
+            if pose_log:  # 로그가 존재하면 마지막 프레임에 라벨 기록
+                pose_log[-1]["true_pose"] = true_label
+                print(f"[수동 라벨 추가] : {true_label}")
+
         elif key == 27:
+            df = pd.DataFrame(pose_log)
+            df.to_csv("pose_log.csv", index=False)
+            print("pose_log.csv 저장 완료")
             break
 
 cap.release()
