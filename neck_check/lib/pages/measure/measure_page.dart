@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'session_page.dart';
+
 class MeasurePage extends StatefulWidget {
   const MeasurePage({super.key});
 
@@ -17,7 +19,11 @@ class _MeasurePageState extends State<MeasurePage> {
           Text('자세 분석 시작', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 80),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(fullscreenDialog: true, builder: (_) => SessionPage()));
+            },
             style: ElevatedButton.styleFrom(
               fixedSize: const Size(220, 68), // 버튼 전체 크기
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20), // 내부 여백

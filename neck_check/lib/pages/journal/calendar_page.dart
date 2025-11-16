@@ -1,5 +1,9 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neck_check/blocs/journal/journal_bloc.dart';
+import 'package:neck_check/models/journal_data.dart';
+import 'package:neck_check/util.dart';
 import 'package:neck_check/widgets/dot.dart';
 import 'package:neck_check/widgets/fixed_height_grid_delegate.dart';
 import 'package:neck_check/widgets/progress_ring.dart';
@@ -23,10 +27,10 @@ class CalendarPage extends StatelessWidget {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(7, (index) {
-                  const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-                  return Text(weekDays[index], style: theme.textTheme.labelLarge);
-                }),
+                children: List.generate(
+                  7,
+                  (index) => Text(weekday(index), style: theme.textTheme.labelLarge),
+                ),
               ),
               SizedBox(height: 4),
               Divider(height: 0),
@@ -66,7 +70,7 @@ class CalendarPage extends StatelessWidget {
           mainAxisExtent: 81, // 아이템 고정 높이
           mainAxisSpacing: 14,
         ),
-        itemCount: firstDay.weekday - 1 + days,
+        itemCount: firstDay.weekday + days,
         itemBuilder: (context, index) {
           final offset = firstDay.weekday - 1;
           if (index <= offset) {
@@ -74,17 +78,28 @@ class CalendarPage extends StatelessWidget {
           }
           final day = index - offset;
 
-          return Column(
-            children: [
-              Text('$day', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              ProgressRing(value: 0.5, size: 39, thickness: 5),
-              const SizedBox(height: 4),
-              Dot(
-                size: 4,
-                color: index % 3 == 0 ? Theme.of(context).colorScheme.onPrimaryContainer : null,
-              ),
-            ],
+          final currentDate = DateTime(year, month, day);
+
+          return BlocBuilder<JournalBloc, JournalState>(
+            builder: (context, state) {
+              JournalData data = JournalData.empty(start: currentDate);
+              if (state is JournalSuccess) data = state.dataByDate(currentDate);
+
+              final isZero = data.goodRatio == 0;
+
+              return GestureDetector(
+                onTap: !isZero ? () => Navigator.of(context).pop<DateTime>(currentDate) : null,
+                child: Column(
+                  children: [
+                    Text('$day', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    ProgressRing(value: data.goodRatio, size: 39, thickness: 5),
+                    const SizedBox(height: 4),
+                    if (!isZero) Dot(size: 4, isActive: data.isGoal),
+                  ],
+                ),
+              );
+            },
           );
         },
       ),

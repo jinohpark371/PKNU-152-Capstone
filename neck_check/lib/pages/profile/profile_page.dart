@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neck_check/pages/setting_page.dart';
+import 'package:neck_check/pages/profile/setting_page.dart';
 import 'package:neck_check/widgets/progress_ring.dart';
 
 class ProfilePage extends StatefulWidget {

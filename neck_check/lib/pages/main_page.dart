@@ -12,18 +12,20 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int currentIndex = 1;
+  final currentIndex = ValueNotifier<int>(1);
+
+  @override
+  void dispose() {
+    currentIndex.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
       bottomNavigationBar: AdaptiveBottomNavigationBar(
-        selectedIndex: currentIndex,
-        onTap: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-        },
+        selectedIndex: currentIndex.value,
+        onTap: (index) => currentIndex.value = index,
         items: [
           AdaptiveNavigationDestination(
             icon: PlatformInfo.isIOS26OrHigher() ? "timer" : CupertinoIcons.timer,
@@ -51,12 +53,16 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
-
       body: Center(
         child: Material(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: widget.body[currentIndex],
+            child: ValueListenableBuilder(
+              valueListenable: currentIndex,
+              builder: (context, value, child) {
+                return widget.body[value];
+              },
+            ),
           ),
         ),
       ),

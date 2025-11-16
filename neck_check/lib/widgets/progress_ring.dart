@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
     super.key,
-    required this.value, // 0.0 ~ 1.0
+    required this.value,
     this.size = 35,
     this.thickness = 3,
     this.color,
@@ -16,6 +16,7 @@ class ProgressRing extends StatelessWidget {
     this.semanticsLabel = 'Progress',
   }) : assert(value >= 0 && value <= 1);
 
+  /// 0.0 ~ 1.0
   final double value;
   final double size;
   final double thickness;
@@ -31,7 +32,7 @@ class ProgressRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final fg = color ?? cs.primary;
-    final bg = backgroundColor ?? cs.surfaceContainerHighest.withAlpha(89);
+    final bg = backgroundColor ?? cs.surfaceContainerHighest.withAlpha(189);
 
     Widget ring(double v) => CustomPaint(
       size: Size.square(size),
