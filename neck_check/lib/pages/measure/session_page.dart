@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -115,7 +116,7 @@ class _SessionPageState extends State<SessionPage> {
                 child: CustomPaint(painter: _FaceBoxPainter(data: _faceData)),
               ),
 
-            // 3. 하단 정보 패널 (JournalPage 스타일 적용)
+            // 3. 하단 정보 패널
             Positioned(
               left: 20,
               right: 20,
@@ -123,7 +124,7 @@ class _SessionPageState extends State<SessionPage> {
               child: _buildInfoOverlay(context),
             ),
 
-            // 4. 상단 컨트롤 바
+            // 4. 상단 컨트롤 바 & 단축키 안내
             Positioned(
               top: safe.top + 10,
               left: 20,
@@ -131,29 +132,23 @@ class _SessionPageState extends State<SessionPage> {
               child: Row(
                 children: [
                   // 오버레이 상태 표시
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          _showBBox ? CupertinoIcons.eye_fill : CupertinoIcons.eye_slash_fill,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          _showBBox ? "표시 중" : "숨김",
-                          style: const TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ],
-                    ),
+                  _buildGlassBadge(
+                    icon: _showBBox ? CupertinoIcons.eye_fill : CupertinoIcons.eye_slash_fill,
+                    text: _showBBox ? "표시 중" : "숨김",
+                    color: Colors.white,
                   ),
+                  const SizedBox(width: 10),
+
+                  // [NEW] 단축키 안내 (Space, T, Q)
+                  _buildGlassBadge(
+                    icon: CupertinoIcons.keyboard,
+                    text: "[Space] 재설정  [T] 토글  [Q] 종료",
+                    color: Colors.white70,
+                  ),
+
                   const Spacer(),
-                  // 종료 버튼 (JournalPage 아이콘 스타일)
+
+                  // 종료 버튼
                   IconButton(
                     onPressed: () => _showStopDialog(context),
                     icon: const Icon(CupertinoIcons.xmark_circle_fill),
@@ -170,7 +165,30 @@ class _SessionPageState extends State<SessionPage> {
     );
   }
 
-  // JournalPage의 텍스트 스타일을 반영한 정보 패널
+  // 상단 바 배지 스타일 (유리창 효과)
+  Widget _buildGlassBadge({required IconData icon, required String text, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white12, // 반투명 유리 느낌
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 하단 정보 패널
   Widget _buildInfoOverlay(BuildContext context) {
     if (_faceData == null) {
       return Center(
@@ -186,7 +204,7 @@ class _SessionPageState extends State<SessionPage> {
     bool isCalibrated = _faceData!['is_calibrated'] ?? false;
     bool isCalibrating = _faceData!['is_calibrating'] ?? false;
 
-    // 상태 텍스트 및 아이콘 결정
+    // 상태 결정
     String statusText;
     IconData statusIcon;
     Color statusColor;
@@ -210,14 +228,13 @@ class _SessionPageState extends State<SessionPage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6), // 반투명 배경으로 가독성 확보
+        color: Colors.black.withOpacity(0.6),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 1. 현재 상태 (거대 텍스트)
           Text(
             interpretation,
             style: const TextStyle(
@@ -232,12 +249,9 @@ class _SessionPageState extends State<SessionPage> {
             isNormal ? "현재 자세가 좋습니다." : "자세를 바르게 고쳐주세요.",
             style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.7)),
           ),
-
           const SizedBox(height: 20),
           const Divider(color: Colors.white24, height: 1),
           const SizedBox(height: 20),
-
-          // 2. 상태 지표 (JournalPage의 IconCard 스타일 축소판)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -289,7 +303,7 @@ class _SessionPageState extends State<SessionPage> {
   }
 }
 
-// === FrameViewer (동일) ===
+// === FrameViewer (영상 갱신) ===
 class FrameViewer extends StatefulWidget {
   final String url;
   const FrameViewer({super.key, required this.url});
@@ -331,7 +345,7 @@ class _FrameViewerState extends State<FrameViewer> {
   }
 }
 
-// === FaceBoxPainter (디자인 개선) ===
+// === FaceBoxPainter (박스 그리기) ===
 class _FaceBoxPainter extends CustomPainter {
   final Map<String, dynamic>? data;
   _FaceBoxPainter({this.data});
@@ -343,12 +357,9 @@ class _FaceBoxPainter extends CustomPainter {
     const double cameraW = 640.0;
     const double cameraH = 480.0;
 
-    // 화면 중앙 정렬을 위한 비율 계산 (Cover 모드)
     double scale = size.height / cameraH;
-    // 너비가 화면보다 클 경우 중앙을 맞추기 위한 오프셋
     double offsetX = (size.width - (cameraW * scale)) / 2;
 
-    // 화면 너비가 더 넓을 경우 (가로모드 등)
     if (size.width > cameraW * scale) {
       scale = size.width / cameraW;
       offsetX = 0;
@@ -388,9 +399,8 @@ class _FaceBoxPainter extends CustomPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0; // 선 두께를 조금 얇게 조정
+      ..strokeWidth = 2.0;
 
-    // 둥근 모서리 박스 그리기 (JournalPage 스타일)
     final rect = RRect.fromRectAndRadius(Rect.fromLTWH(x, y, w, h), const Radius.circular(12));
     canvas.drawRRect(rect, paint);
   }
