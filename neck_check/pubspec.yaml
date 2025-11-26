@@ -23,6 +23,7 @@ dependencies:
 
   http: ^1.6.0     
   flutter_local_notifications: ^19.5.0
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_test:

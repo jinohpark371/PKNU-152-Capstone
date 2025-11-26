@@ -10,8 +10,6 @@ class SettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final safeArea = MediaQuery.of(context).padding;
-
     return Scaffold(
       appBar: AppBar(title: Text('더 보기')),
       body: Material(

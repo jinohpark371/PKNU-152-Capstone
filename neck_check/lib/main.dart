@@ -1,24 +1,33 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:neck_check/blocs/journal/journal_bloc.dart';
 import 'package:neck_check/pages/main_page.dart';
 import 'package:neck_check/pages/journal/journal_page.dart';
 import 'package:neck_check/pages/measure/measure_page.dart';
 import 'package:neck_check/pages/profile/profile_page.dart';
 import 'package:neck_check/pages/statistics/statistics_page.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // iOS는 무시, Android 투명
-      statusBarIconBrightness: Brightness.dark, // Android 흰색 아이콘
-      statusBarBrightness: Brightness.dark, // iOS 흰색 아이콘 (LightContent)
-    ),
+
+  // [추가] 윈도우 매니저 초기화 및 설정
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(1200, 800), // 앱 실행 시 초기 크기 (원하는 대로 조절 가능)
+    minimumSize: Size(800, 600), // [핵심] 사용자가 이보다 작게 줄일 수 없음
+    center: true, // 실행 시 화면 중앙 배치
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal, // 기본 타이틀 바 유지 (커스텀 원하면 hidden으로 변경)
   );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
   runApp(const MainApp());
 }
 
@@ -43,7 +52,7 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: theme,
-        home: MainPage(body: [MeasurePage(), JournalPage(), StatisticsPage(), ProfilePage()]),
+        home: MainPage(body: const [MeasurePage(), JournalPage(), StatisticsPage(), ProfilePage()]),
       ),
     );
   }

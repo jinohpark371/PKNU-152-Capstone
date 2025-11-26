@@ -27,7 +27,7 @@ class _MainPageState extends State<MainPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           // 화면 너비가 800 이상이면 확장(Expanded) 모드로 설정
-          isExtended.value = constraints.maxWidth >= 800;
+          isExtended.value = constraints.maxWidth > 800;
 
           return Row(
             children: [
@@ -41,7 +41,7 @@ class _MainPageState extends State<MainPage> {
                     onDestinationSelected: (index) => currentIndex.value = index,
                     extended: isEx,
                     labelType: isEx ? NavigationRailLabelType.none : NavigationRailLabelType.all,
-                    minExtendedWidth: 200,
+                    minExtendedWidth: 150,
                     destinations: const [
                       NavigationRailDestination(
                         icon: Icon(CupertinoIcons.timer),

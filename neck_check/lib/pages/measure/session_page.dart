@@ -36,7 +36,6 @@ class _SessionPageState extends State<SessionPage> {
   @override
   void initState() {
     super.initState();
-    // [NEW] 알림 초기화
     _initNotifications();
 
     _timer = Timer.periodic(const Duration(milliseconds: 33), (timer) {
@@ -44,7 +43,6 @@ class _SessionPageState extends State<SessionPage> {
     });
   }
 
-  // [NEW] 알림 시스템 초기화 함수
   Future<void> _initNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -69,7 +67,6 @@ class _SessionPageState extends State<SessionPage> {
     await _notificationsPlugin.initialize(initializationSettings);
   }
 
-  // [NEW] 알림 표시 함수
   Future<void> _showNotification(String message) async {
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'posture_channel',
