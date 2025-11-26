@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key});
@@ -25,6 +25,10 @@ class _SessionPageState extends State<SessionPage> {
   Timer? _timer;
   Map<String, dynamic>? _faceData;
 
+  // [NEW] 알림 관련 변수
+  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  String? _lastAlertMessage; // Python의 last_processed_alert 역할
+
   // 키보드 제어
   final FocusNode _focusNode = FocusNode();
   bool _showBBox = true;
@@ -32,9 +36,66 @@ class _SessionPageState extends State<SessionPage> {
   @override
   void initState() {
     super.initState();
+    // [NEW] 알림 초기화
+    _initNotifications();
+
     _timer = Timer.periodic(const Duration(milliseconds: 33), (timer) {
       if (mounted) _fetchFaceData();
     });
+  }
+
+  // [NEW] 알림 시스템 초기화 함수
+  Future<void> _initNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
+
+    const LinuxInitializationSettings initializationSettingsLinux = LinuxInitializationSettings(
+      defaultActionName: 'Open notification',
+    );
+
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
+      linux: initializationSettingsLinux,
+    );
+
+    await _notificationsPlugin.initialize(initializationSettings);
+  }
+
+  // [NEW] 알림 표시 함수
+  Future<void> _showNotification(String message) async {
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'posture_channel',
+      'Posture Alerts',
+      channelDescription: '알림을 통해 자세 교정을 유도합니다.',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const DarwinNotificationDetails macosDetails = DarwinNotificationDetails(
+      presentAlert: true, // 배너 표시
+      presentBadge: true, // 뱃지 표시
+      presentSound: true, // 소리 재생
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidDetails,
+      macOS: macosDetails,
+    );
+
+    await _notificationsPlugin.show(
+      0, // ID (0으로 고정하여 최신 알림이 이전 알림을 덮어쓰게 함)
+      '자세 교정 알림',
+      message,
+      platformChannelSpecifics,
+    );
   }
 
   Future<void> _fetchFaceData() async {
@@ -43,12 +104,35 @@ class _SessionPageState extends State<SessionPage> {
           .get(Uri.parse(dataUrl))
           .timeout(const Duration(milliseconds: 200));
       if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // [NEW] 알림 로직 처리 (Python 코드 이식)
+        _handleAlertLogic(data);
+
         setState(() {
-          _faceData = json.decode(response.body);
+          _faceData = data;
         });
       }
     } catch (e) {
       // 통신 에러 무시
+    }
+  }
+
+  // [NEW] Python의 알림 중복 방지 로직 이식
+  void _handleAlertLogic(Map<String, dynamic> data) {
+    String? currentAlert = data['alert_message'];
+
+    // 1. 알림 메시지가 있고, 직전 알림과 다를 때만 실행
+    if (currentAlert != null && currentAlert != _lastAlertMessage) {
+      _showNotification(currentAlert);
+      print("🔔 ALERT TRIGGERED: $currentAlert");
+
+      // 처리한 메시지 기록
+      _lastAlertMessage = currentAlert;
+    }
+    // 2. 서버에서 알림이 사라지면(null), 클라이언트 기억 리셋
+    else if (currentAlert == null) {
+      _lastAlertMessage = null;
     }
   }
 
@@ -139,7 +223,7 @@ class _SessionPageState extends State<SessionPage> {
                   ),
                   const SizedBox(width: 10),
 
-                  // [NEW] 단축키 안내 (Space, T, Q)
+                  // 단축키 안내
                   _buildGlassBadge(
                     icon: CupertinoIcons.keyboard,
                     text: "[Space] 재설정  [T] 토글  [Q] 종료",
@@ -170,7 +254,7 @@ class _SessionPageState extends State<SessionPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white12, // 반투명 유리 느낌
+        color: Colors.white12,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
@@ -359,10 +443,12 @@ class _FaceBoxPainter extends CustomPainter {
 
     double scale = size.height / cameraH;
     double offsetX = (size.width - (cameraW * scale)) / 2;
+    double offsetY = (size.height - (cameraH * scale)) / 2;
 
     if (size.width > cameraW * scale) {
       scale = size.width / cameraW;
       offsetX = 0;
+      offsetY = (size.height - (cameraH * scale)) / 2;
     }
 
     if (data!['is_calibrated'] == true && data!['target_bbox'] != null) {
@@ -371,14 +457,14 @@ class _FaceBoxPainter extends CustomPainter {
         data!['target_bbox'],
         scale,
         offsetX,
-        0,
+        offsetY,
         Colors.white.withOpacity(0.3),
         "기준",
       );
     }
 
     if (data!['detected'] == true && data!['bbox'] != null) {
-      _drawBox(canvas, data!['bbox'], scale, offsetX, 0, Colors.blueAccent, "현재");
+      _drawBox(canvas, data!['bbox'], scale, offsetX, offsetY, Colors.blueAccent, "현재");
     }
   }
 
