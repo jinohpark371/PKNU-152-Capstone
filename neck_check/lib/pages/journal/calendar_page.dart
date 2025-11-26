@@ -1,4 +1,3 @@
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neck_check/blocs/journal/journal_bloc.dart';
@@ -14,14 +13,12 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safeArea = MediaQuery.of(context).padding;
-    final topPadding = PlatformInfo.isIOS26OrHigher() ? safeArea.top + 62.0 : 25.0;
 
-    return AdaptiveScaffold(
-      appBar: AdaptiveAppBar(title: '달력'),
+    return Scaffold(
+      appBar: AppBar(title: Text('달력')),
       body: Material(
         child: Padding(
-          padding: EdgeInsets.only(top: topPadding, right: 20, left: 20),
+          padding: EdgeInsets.only(top: 25, right: 20, left: 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

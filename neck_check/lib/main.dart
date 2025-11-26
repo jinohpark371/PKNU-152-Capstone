@@ -40,30 +40,9 @@ class MainApp extends StatelessWidget {
           create: (BuildContext context) => JournalBloc()..add(FetchAllJournalData()),
         ),
       ],
-      child: CupertinoApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: [Locale('ko', '')],
-        theme: CupertinoThemeData(
-          brightness: Brightness.dark,
-          primaryColor: theme.colorScheme.primary,
-          primaryContrastingColor: theme.colorScheme.onPrimary,
-          scaffoldBackgroundColor: theme.colorScheme.surface,
-          barBackgroundColor: theme.colorScheme.surface,
-          textTheme: CupertinoTextThemeData(
-            primaryColor: theme.colorScheme.onSurface,
-            textStyle: TextStyle(color: theme.colorScheme.onSurface),
-            navTitleTextStyle: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
+        theme: theme,
         home: MainPage(body: [MeasurePage(), JournalPage(), StatisticsPage(), ProfilePage()]),
       ),
     );

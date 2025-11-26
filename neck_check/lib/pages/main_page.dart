@@ -1,4 +1,3 @@
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,58 +12,77 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final currentIndex = ValueNotifier<int>(1);
+  final isExtended = ValueNotifier<bool>(false);
 
   @override
   void dispose() {
     currentIndex.dispose();
+    isExtended.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      bottomNavigationBar: AdaptiveBottomNavigationBar(
-        selectedIndex: currentIndex.value,
-        onTap: (index) => currentIndex.value = index,
-        items: [
-          AdaptiveNavigationDestination(
-            icon: PlatformInfo.isIOS26OrHigher() ? "timer" : CupertinoIcons.timer,
-            selectedIcon: CupertinoIcons.timer_fill,
-            label: '측정',
-          ),
-          AdaptiveNavigationDestination(
-            icon: PlatformInfo.isIOS26OrHigher() ? "book.fill" : CupertinoIcons.book,
-            selectedIcon: CupertinoIcons.book_fill,
-            label: '일지',
-          ),
-          AdaptiveNavigationDestination(
-            icon: PlatformInfo.isIOS26OrHigher()
-                ? "chart.bar.fill"
-                : CupertinoIcons.chart_bar_alt_fill,
-            selectedIcon: CupertinoIcons.chart_bar_alt_fill,
-            label: '통계',
-          ),
-          AdaptiveNavigationDestination(
-            icon: PlatformInfo.isIOS26OrHigher()
-                ? "person.circle.fill"
-                : CupertinoIcons.person_circle,
-            selectedIcon: CupertinoIcons.person_circle_fill,
-            label: '프로필',
-          ),
-        ],
-      ),
-      body: Center(
-        child: Material(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ValueListenableBuilder(
-              valueListenable: currentIndex,
-              builder: (context, value, child) {
-                return widget.body[value];
-              },
-            ),
-          ),
-        ),
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // 화면 너비가 800 이상이면 확장(Expanded) 모드로 설정
+          isExtended.value = constraints.maxWidth >= 800;
+
+          return Row(
+            children: [
+              // 1. NavigationRail
+              ValueListenableBuilder(
+                valueListenable: isExtended,
+                builder: (_, isEx, _) => ValueListenableBuilder(
+                  valueListenable: currentIndex,
+                  builder: (_, currentIn, _) => NavigationRail(
+                    selectedIndex: currentIn,
+                    onDestinationSelected: (index) => currentIndex.value = index,
+                    extended: isEx,
+                    labelType: isEx ? NavigationRailLabelType.none : NavigationRailLabelType.all,
+                    minExtendedWidth: 200,
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(CupertinoIcons.timer),
+                        selectedIcon: Icon(CupertinoIcons.timer_fill),
+                        label: Text('측정'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(CupertinoIcons.book),
+                        selectedIcon: Icon(CupertinoIcons.book_fill),
+                        label: Text('일지'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(CupertinoIcons.chart_bar_alt_fill),
+                        selectedIcon: Icon(CupertinoIcons.chart_bar_alt_fill),
+                        label: Text('통계'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(CupertinoIcons.person_circle),
+                        selectedIcon: Icon(CupertinoIcons.person_circle_fill),
+                        label: Text('프로필'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 2. 구분선
+              const VerticalDivider(thickness: 1, width: 1),
+
+              // 3. 메인 콘텐츠
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable: currentIndex,
+                  builder: (context, value, child) {
+                    return widget.body[value];
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

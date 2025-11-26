@@ -1,4 +1,3 @@
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -12,13 +11,12 @@ class SettingPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     final safeArea = MediaQuery.of(context).padding;
-    final topPadding = PlatformInfo.isIOS26OrHigher() ? 100 : 0;
 
-    return AdaptiveScaffold(
-      appBar: AdaptiveAppBar(title: '더 보기'),
+    return Scaffold(
+      appBar: AppBar(title: Text('더 보기')),
       body: Material(
         child: ListView(
-          padding: EdgeInsets.only(top: safeArea.top + topPadding, bottom: 50, right: 20, left: 20),
+          padding: EdgeInsets.only(top: 0, bottom: 50, right: 20, left: 20),
           children: [
             Text(
               '개인용',

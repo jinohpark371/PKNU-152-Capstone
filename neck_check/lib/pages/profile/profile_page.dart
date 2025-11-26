@@ -13,11 +13,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    final safeArea = MediaQuery.of(context).padding;
     final theme = Theme.of(context);
 
     return ListView(
-      padding: EdgeInsets.only(top: safeArea.top + 36, bottom: safeArea.bottom + 100),
+      padding: const EdgeInsets.all(60),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

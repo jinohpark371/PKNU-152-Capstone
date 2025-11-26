@@ -4,14 +4,15 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.9.2
+  sdk: '>=3.10.0 <4.0.0'
+  flutter: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  adaptive_platform_ui: ^0.1.100
+
   cupertino_icons: ^1.0.8
   fl_chart: ^1.1.1
 
@@ -19,6 +20,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   bloc: ^9.1.0
   meta: ^1.16.0
+
+  http: ^1.6.0      
 
 dev_dependencies:
   flutter_test:

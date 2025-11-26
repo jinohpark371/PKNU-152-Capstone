@@ -12,17 +12,6 @@ import 'package:neck_check/widgets/progress_ring.dart';
 
 import 'calendar_page.dart';
 
-/// 위젯은 Material3 Component
-/// 텍스트는 Material3 TextTheme
-/// 아이콘은 CupertinoIcons
-
-/// 서버 필요없는 데이터: 요일, 날짜
-/// 서버 필요한 데이터: goodPoseRatio, isGoal
-
-/// 1. ValueNotifier 다시 롤백 <완료>
-/// 2. 탭바 만들기 (GoRouter 참고)
-/// 3. CustomScrollView, SliverPersistentHeader(pinned: true)
-
 class JournalPage extends StatefulWidget {
   const JournalPage({super.key});
 
@@ -41,12 +30,9 @@ class _JournalPageState extends State<JournalPage> {
 
   @override
   Widget build(BuildContext context) {
-    final safeArea = MediaQuery.of(context).padding;
     return ListView(
-      padding: EdgeInsets.only(
-        top: safeArea.top + 35,
-        bottom: safeArea.bottom + kBottomNavigationBarHeight,
-      ),
+      addAutomaticKeepAlives: true,
+      padding: const EdgeInsets.all(60),
       children: [
         _Header(date),
         const Divider(height: 20),
@@ -311,6 +297,7 @@ class _GraphDisplayState extends State<_GraphDisplay> {
     return Column(
       children: [
         Row(
+          spacing: 5,
           children: [
             _createChoiceChip(0, '측정 시간', CupertinoIcons.stopwatch_fill),
             _createChoiceChip(1, '거북목', CupertinoIcons.person_alt),
