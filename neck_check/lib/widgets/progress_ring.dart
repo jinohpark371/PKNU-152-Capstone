@@ -14,7 +14,7 @@ class ProgressRing extends StatelessWidget {
     this.animate = true,
     this.duration = const Duration(milliseconds: 600),
     this.semanticsLabel = 'Progress',
-  }) : assert(value >= 0 && value <= 1);
+  });
 
   /// 0.0 ~ 1.0
   final double value;
@@ -55,9 +55,11 @@ class ProgressRing extends StatelessWidget {
           )
         : ring(value);
 
+    final percent = (value.isFinite) ? (value.clamp(0.0, 1.0) * 100).round() : 0;
+
     return ConstrainedBox(
       constraints: BoxConstraints.tight(Size(size, size)),
-      child: Semantics(label: semanticsLabel, value: '${(value * 100).round()}%', child: painted),
+      child: Semantics(label: semanticsLabel, value: '$percent%', child: painted),
     );
   }
 }

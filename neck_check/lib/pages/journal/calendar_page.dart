@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neck_check/blocs/journal/journal_bloc.dart';
-import 'package:neck_check/models/journal_data.dart';
 import 'package:neck_check/util.dart';
-import 'package:neck_check/widgets/dot.dart';
 import 'package:neck_check/widgets/fixed_height_grid_delegate.dart';
 import 'package:neck_check/widgets/progress_ring.dart';
+
+import '../../blocs/stats/stats_bloc.dart';
+import 'journal_page.dart';
 
 class CalendarPage extends StatelessWidget {
   const CalendarPage({super.key});
@@ -77,26 +77,19 @@ class CalendarPage extends StatelessWidget {
 
           final currentDate = DateTime(year, month, day);
 
-          return BlocBuilder<JournalBloc, JournalState>(
-            builder: (context, state) {
-              JournalData data = JournalData.empty(start: currentDate);
-              if (state is JournalSuccess) data = state.dataByDate(currentDate);
-
-              final isZero = data.goodRatio == 0;
-
-              return GestureDetector(
-                onTap: !isZero ? () => Navigator.of(context).pop<DateTime>(currentDate) : null,
-                child: Column(
-                  children: [
-                    Text('$day', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    ProgressRing(value: data.goodRatio, size: 39, thickness: 5),
-                    const SizedBox(height: 4),
-                    if (!isZero) Dot(size: 4, isActive: data.isGoal),
-                  ],
-                ),
-              );
+          return GestureDetector(
+            onTap: () {
+              context.read<StatsBloc>().add(FetchStatsDetail(formatDate(currentDate)));
+              Navigator.of(context).pop<DateTime>(currentDate);
             },
+            child: Column(
+              children: [
+                Text('$day', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                ProgressRing(value: 1, size: 39, thickness: 5),
+                const SizedBox(height: 4),
+              ],
+            ),
           );
         },
       ),

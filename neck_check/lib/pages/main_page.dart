@@ -11,7 +11,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final currentIndex = ValueNotifier<int>(1);
+  final currentIndex = ValueNotifier<int>(0); // 초기값은 '측정' 탭이라고 가정
   final isExtended = ValueNotifier<bool>(false);
 
   @override
@@ -73,10 +73,10 @@ class _MainPageState extends State<MainPage> {
 
               // 3. 메인 콘텐츠
               Expanded(
-                child: ValueListenableBuilder(
+                child: ValueListenableBuilder<int>(
                   valueListenable: currentIndex,
                   builder: (context, value, child) {
-                    return widget.body[value];
+                    return IndexedStack(index: value, children: widget.body);
                   },
                 ),
               ),
