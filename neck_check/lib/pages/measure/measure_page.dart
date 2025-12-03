@@ -72,9 +72,6 @@ class _MeasurePageState extends State<MeasurePage> {
   // =========================
 
   Future<void> _initNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
     const DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
       requestSoundPermission: true,
       requestBadgePermission: true,
@@ -84,8 +81,6 @@ class _MeasurePageState extends State<MeasurePage> {
     // Linux/Windows 설정 생략 (필요 시 추가)
 
     const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
       macOS: initializationSettingsDarwin,
     );
 
@@ -209,11 +204,25 @@ class _MeasurePageState extends State<MeasurePage> {
 
   Future<void> _showNotification(String message) async {
     if (!_notificationsInitialized) return;
-    const details = NotificationDetails(
-      macOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
-      android: AndroidNotificationDetails('posture', 'Alerts', importance: Importance.max),
+    const DarwinNotificationDetails darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentSound: true,
+      presentBadge: true,
     );
-    await _notificationsPlugin.show(0, '자세 교정 알림', message, details);
+
+    // 통합 알림 설정
+    const NotificationDetails details = NotificationDetails(
+      iOS: darwinDetails,
+      macOS: darwinDetails, // macOS 적용
+      // Windows는 별도의 Details 객체 없이 시스템 기본 Toast 알림을 사용합니다.
+    );
+
+    await _notificationsPlugin.show(
+      0, // Notification ID (0이면 계속 덮어씌움)
+      '자세 교정 알림', // 제목
+      message, // 본문
+      details,
+    );
   }
 
   // =========================
